@@ -50,7 +50,7 @@ public class MemberController {
      * 로그인
      */
     @PostMapping("/sign-in")
-    public ResponseEntity<JwtDTO> signIn(@RequestBody SignInDTO signInDTO) {
+    public ResponseEntity<JwtDTO> signIn(@Valid @RequestBody SignInDTO signInDTO) {
         JwtDTO jwtDTO = memberService.signIn(signInDTO);
         return ResponseEntity.ok(jwtDTO);
     }

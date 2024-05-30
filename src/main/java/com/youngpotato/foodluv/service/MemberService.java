@@ -27,15 +27,15 @@ public class MemberService {
     @Transactional
     public MemberDTO signup(SignUpDTO signUpDTO) {
         // 이메일, 닉네임 중복 체크
-        if (memberRepository.existsByEmail(signUpDTO.getEmail())) {
+        if (memberRepository.existsByEmail(signUpDTO.email())) {
             throw new IllegalArgumentException("이미 사용 중인 이메일입니다.");
         }
-        if (memberRepository.existsByNickname(signUpDTO.getNickname())) {
+        if (memberRepository.existsByNickname(signUpDTO.nickname())) {
             throw new IllegalArgumentException("이미 사용 중인 닉네임입니다.");
         }
 
         // 비밀번호 암호화
-        String encodedPassword = passwordEncoder.encode(signUpDTO.getPassword());
+        String encodedPassword = passwordEncoder.encode(signUpDTO.password());
 
         // 회원가입 처리
         Member newMember = memberRepository.save(signUpDTO.toEntity(encodedPassword, "ROLE_USER"));
