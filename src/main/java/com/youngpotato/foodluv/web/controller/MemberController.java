@@ -1,7 +1,5 @@
 package com.youngpotato.foodluv.web.controller;
 
-import com.youngpotato.foodluv.common.util.SecurityUtil;
-import com.youngpotato.foodluv.domain.member.Member;
 import com.youngpotato.foodluv.service.MemberService;
 import com.youngpotato.foodluv.web.dto.JwtDTO;
 import com.youngpotato.foodluv.web.dto.MemberDTO;
@@ -24,7 +22,6 @@ public class MemberController {
      */
     @GetMapping("/get-test")
     public ResponseEntity<String> test() {
-        String email = SecurityUtil.getCurrentEmail();
         return ResponseEntity.ok("success");
     }
     @GetMapping("/user/get-test")
@@ -45,9 +42,8 @@ public class MemberController {
      */
     @PostMapping("/sign-up")
     public ResponseEntity<MemberDTO> signup(@Valid @RequestBody SignUpDTO signUpDTO) {
-        Member member = memberService.signup(signUpDTO);
-        MemberDTO memberDTO = MemberDTO.from(member);
-        return ResponseEntity.ok(memberDTO);
+        MemberDTO savedMemberDTO = memberService.signup(signUpDTO);
+        return ResponseEntity.ok(savedMemberDTO);
     }
 
     /**

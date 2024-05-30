@@ -4,6 +4,7 @@ import com.youngpotato.foodluv.common.jwt.JwtProvider;
 import com.youngpotato.foodluv.domain.member.Member;
 import com.youngpotato.foodluv.domain.member.MemberRepository;
 import com.youngpotato.foodluv.web.dto.JwtDTO;
+import com.youngpotato.foodluv.web.dto.MemberDTO;
 import com.youngpotato.foodluv.web.dto.SignInDTO;
 import com.youngpotato.foodluv.web.dto.SignUpDTO;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +25,7 @@ public class MemberService {
     private final JwtProvider jwtProvider;
 
     @Transactional
-    public Member signup(SignUpDTO signUpDTO) {
+    public MemberDTO signup(SignUpDTO signUpDTO) {
         // 이메일, 닉네임 중복 체크
         if (memberRepository.existsByEmail(signUpDTO.getEmail())) {
             throw new IllegalArgumentException("이미 사용 중인 이메일입니다.");
@@ -33,17 +34,13 @@ public class MemberService {
             throw new IllegalArgumentException("이미 사용 중인 닉네임입니다.");
         }
 
-        // 비밀번호 인코딩
+        // 비밀번호 암호화
         String encodedPassword = passwordEncoder.encode(signUpDTO.getPassword());
 
-        Member member = Member.builder()
-                .email(signUpDTO.getEmail())
-                .password(encodedPassword)
-                .nickname(signUpDTO.getNickname())
-                .roles("ROLE_USER")
-                .build();
+        // 회원가입 처리
+        Member newMember = memberRepository.save(signUpDTO.toEntity(encodedPassword, "ROLE_USER"));
 
-        return memberRepository.save(member);
+        return MemberDTO.toDto(newMember);
     }
 
     @Transactional
@@ -59,8 +56,6 @@ public class MemberService {
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
 
         // 3. 인증 정보를 기반으로 JWT 토큰 생성
-        JwtDTO jwt = jwtProvider.generateToken(authentication);
-
-        return jwt;
+        return jwtProvider.generateToken(authentication);
     }
 }

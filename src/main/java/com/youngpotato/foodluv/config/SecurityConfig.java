@@ -29,7 +29,6 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
-
         httpSecurity
                 // REST API이므로 csrf 보안 및 basic auth를 사용하지 않음
                 .csrf(AbstractHttpConfigurer::disable)
