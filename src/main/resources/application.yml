@@ -1,5 +1,11 @@
 server:
   port: 8888
+  servlet:
+    context-path: /
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
 #  error:
 #    whitelabel:
 #      enabled: false
@@ -7,11 +13,13 @@ server:
 spring:
   application:
     name: food-luv-back
+
   datasource:
     url: jdbc:h2:mem:testdb
     driver-class-name: org.h2.Driver
     username: sa
     password:
+
   h2:
     console:
       enabled: true
@@ -21,15 +29,17 @@ spring:
       mode: always
       schema-locations: classpath:sql/schema.sql
       data-locations: classpath:sql/data.sql
+
   jpa:
     database: h2
     show-sql: true
     hibernate:
       ddl-auto: none
-#    open-in-view: true
     properties:
       hibernate:
         format_sql: true
+#    open-in-view: true
+
 #  mvc:
 #    throw-exception-if-no-handler-found: true
 #  web:
