@@ -3,11 +3,9 @@ package com.youngpotato.foodluv.common.audit;
 import com.youngpotato.foodluv.common.auth.PrincipalDetails;
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 public class AuditorAwareImpl implements AuditorAware<Long> {
 
@@ -24,15 +22,14 @@ public class AuditorAwareImpl implements AuditorAware<Long> {
     }
 
     /**
-     * Authentication 객체가 인증되지 않았거나 익명 사용자인지 확인
+     * Authentication 객체가 인증되지 않았거나 익명 사용자라면 true 반환
      */
     public boolean isAnonymous(Authentication authentication) {
-        return authentication == null || authentication.getName() == null ||
-                (authentication.getPrincipal().equals("anonymousUser") &&
-                        authentication.getAuthorities().stream()
-                                .map(GrantedAuthority::getAuthority)
-                                .collect(Collectors.joining(","))
-                                .equals("ROLE_ANONYMOUS")
-                );
+        if (authentication == null || authentication.getName() == null) {
+            return true;
+        }
+
+        return "anonymousUser".equals(authentication.getPrincipal()) &&
+                authentication.getAuthorities().stream().anyMatch(auth -> "ROLE_ANONYMOUS".equals(auth.getAuthority()));
     }
 }
