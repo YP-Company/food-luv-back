@@ -35,9 +35,12 @@ public class PrincipalDetails implements UserDetails {
 //        this.attributes = attributes;
 //    }
 
-    /**
-     * 해당 Member의 권한 리턴
-     */
+    /** memberId 리턴 */
+    public Long getMemberId() {
+        return member.getMemberId();
+    }
+
+    /** roles 리턴 */
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         Collection<GrantedAuthority> authorities = new ArrayList<>();
@@ -45,11 +48,13 @@ public class PrincipalDetails implements UserDetails {
         return authorities;
     }
 
+    /** password 리턴 */
     @Override
     public String getPassword() {
         return member.getPassword();
     }
 
+    /** email 리턴 */
     @Override
     public String getUsername() {
         return member.getEmail();
