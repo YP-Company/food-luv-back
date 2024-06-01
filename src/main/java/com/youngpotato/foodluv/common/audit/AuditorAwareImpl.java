@@ -13,23 +13,12 @@ public class AuditorAwareImpl implements AuditorAware<Long> {
     public Optional<Long> getCurrentAuditor() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        if (isAnonymous(authentication)) {
+        // Authentication 객체가 인증되지 않았거나 익명 사용자인 경우
+        if (authentication == null || authentication.getName() == null || authentication.getPrincipal().equals("anonymousUser")) {
             return Optional.of(0L);
         }
 
         PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
         return Optional.of(principal.getMemberId());
-    }
-
-    /**
-     * Authentication 객체가 인증되지 않았거나 익명 사용자라면 true 반환
-     */
-    public boolean isAnonymous(Authentication authentication) {
-        if (authentication == null || authentication.getName() == null) {
-            return true;
-        }
-
-        return "anonymousUser".equals(authentication.getPrincipal()) &&
-                authentication.getAuthorities().stream().anyMatch(auth -> "ROLE_ANONYMOUS".equals(auth.getAuthority()));
     }
 }

@@ -2,10 +2,11 @@ package com.youngpotato.foodluv.common.auth;
 
 import com.youngpotato.foodluv.domain.member.Member;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
 
 /**
@@ -40,12 +41,14 @@ public class PrincipalDetails implements UserDetails {
         return member.getMemberId();
     }
 
-    /** roles 리턴 */
+    /** role 리턴 */
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        Collection<GrantedAuthority> authorities = new ArrayList<>();
-        member.getRoleList().forEach(r -> authorities.add(() -> r));
-        return authorities;
+        // 단일 역할을 authorities로 변환하여 반환
+        if (member.getRole() == null) {
+            return Collections.emptyList();
+        }
+        return Collections.singletonList(new SimpleGrantedAuthority(member.getRole().getRole()));
     }
 
     /** password 리턴 */

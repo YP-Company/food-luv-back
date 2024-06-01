@@ -8,9 +8,9 @@ CREATE TABLE member (
     email varchar(255) NOT NULL,
     password varchar(255) NOT NULL,
     nickname varchar(255) NOT NULL,
-    roles varchar(255) NOT NULL,
---     provider varchar(255) DEFAULT NULL,
---     provider_id varchar(255) DEFAULT NULL,
+    role varchar(255) NOT NULL,
+    provider varchar(255) DEFAULT NULL,
+    provider_id varchar(255) DEFAULT NULL,
     PRIMARY KEY (`member_id`)
 );
 COMMENT ON COLUMN member.member_id IS '회원 고유 식별자';
@@ -21,6 +21,6 @@ COMMENT ON COLUMN member.upd_member_id IS '수정자 고유 식별자';
 COMMENT ON COLUMN member.email IS '이메일';
 COMMENT ON COLUMN member.password IS '비밀번호';
 COMMENT ON COLUMN member.nickname IS '별명';
-COMMENT ON COLUMN member.roles IS '권한';
--- COMMENT ON COLUMN member.provider IS '?';
--- COMMENT ON COLUMN member.provider_id IS '?';
+COMMENT ON COLUMN member.role IS '권한';
+COMMENT ON COLUMN member.provider IS '제공자';
+COMMENT ON COLUMN member.provider_id IS '제공자 고유 식별자';

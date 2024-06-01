@@ -1,5 +1,6 @@
 package com.youngpotato.foodluv.service;
 
+import com.youngpotato.foodluv.common.auth.Role;
 import com.youngpotato.foodluv.common.jwt.JwtProvider;
 import com.youngpotato.foodluv.domain.member.Member;
 import com.youngpotato.foodluv.domain.member.MemberRepository;
@@ -38,7 +39,7 @@ public class MemberService {
         String encodedPassword = passwordEncoder.encode(signUpDTO.password());
 
         // 회원가입 처리
-        Member newMember = memberRepository.save(signUpDTO.toEntity(encodedPassword, "ROLE_USER"));
+        Member newMember = memberRepository.save(signUpDTO.toEntity(encodedPassword, Role.ROLE_USER));
 
         return MemberDTO.toDto(newMember);
     }
