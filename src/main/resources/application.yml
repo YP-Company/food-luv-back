@@ -40,6 +40,12 @@ spring:
         format_sql: true
 #    open-in-view: true
 
+  devtools:
+    livereload:
+      enabled: true
+    restart:
+      enabled: true
+
 #  mvc:
 #    throw-exception-if-no-handler-found: true
 #  web:
