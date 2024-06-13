@@ -18,26 +18,6 @@ public class MemberController {
     private final MemberService memberService;
 
     /**
-     * test
-     */
-    @GetMapping("/get-test")
-    public ResponseEntity<String> test() {
-        return ResponseEntity.ok("success");
-    }
-    @GetMapping("/user/get-test")
-    public ResponseEntity<String> test1() {
-        return ResponseEntity.ok("success");
-    }
-    @GetMapping("/manager/get-test")
-    public ResponseEntity<String> test2() {
-        return ResponseEntity.ok("success");
-    }
-    @GetMapping("/admin/get-test")
-    public ResponseEntity<String> test3() {
-        return ResponseEntity.ok("success");
-    }
-
-    /**
      * 일반 회원가입
      */
     @PostMapping("/sign-up")
