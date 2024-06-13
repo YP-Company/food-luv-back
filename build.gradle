@@ -35,6 +35,10 @@ dependencies {
     // DB
     runtimeOnly 'com.h2database:h2'
 
+    // Redis
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    implementation 'org.springframework.boot:spring-boot-starter-cache'
+
     // Security
     implementation 'org.springframework.boot:spring-boot-starter-security'
 
