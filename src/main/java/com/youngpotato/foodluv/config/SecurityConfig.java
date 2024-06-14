@@ -15,6 +15,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.web.filter.CorsFilter;
 
 /**
  * Spring Security의 설정을 담당
@@ -25,6 +26,8 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
+    private final CorsConfig corsConfig;
+    private final CorsFilter corsFilter;
     private final JwtProvider jwtProvider;
 
     @Bean
@@ -32,6 +35,8 @@ public class SecurityConfig {
         httpSecurity
                 // REST API이므로 csrf 보안 및 basic auth를 사용하지 않음
                 .csrf(AbstractHttpConfigurer::disable)
+                .addFilter(corsConfig.corsFilter())
+                .addFilterBefore(corsFilter, UsernamePasswordAuthenticationFilter.class)
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
 
