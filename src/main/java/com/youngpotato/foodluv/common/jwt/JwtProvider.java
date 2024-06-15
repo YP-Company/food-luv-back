@@ -1,6 +1,7 @@
 package com.youngpotato.foodluv.common.jwt;
 
 import com.youngpotato.foodluv.common.Constants;
+import com.youngpotato.foodluv.common.auth.PrincipalDetailsService;
 import com.youngpotato.foodluv.web.dto.JwtDTO;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
@@ -10,14 +11,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Date;
 import java.util.stream.Collectors;
 
@@ -25,24 +22,22 @@ import java.util.stream.Collectors;
 @Component
 public class JwtProvider {
 
+    private static final long ACCESS_TOKEN_EXPIRE_TIME = 30 * 60 * 1000L;              // 30분
+    private static final long REFRESH_TOKEN_EXPIRE_TIME = 7 * 24 * 60 * 60 * 1000L;    // 7일
     private final Key key;
-    private final long accessTokenValidityInMilliseconds;
-    private final long refreshTokenValidityInMilliseconds;
+    private final PrincipalDetailsService principalDetailsService;
 
-    public JwtProvider(@Value("${jwt.secret}") String secretKey,
-                       @Value("${jwt.access-token-validity-in-seconds}") long accessTokenValidityInSeconds,
-                       @Value("${jwt.refresh-token-validity-in-seconds}") long refreshTokenValidityInSeconds) {
+    public JwtProvider(@Value("${jwt.secret}") String secretKey, PrincipalDetailsService principalDetailsService) {
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         this.key = Keys.hmacShaKeyFor(keyBytes);
-        this.accessTokenValidityInMilliseconds = accessTokenValidityInSeconds;
-        this.refreshTokenValidityInMilliseconds = refreshTokenValidityInSeconds;
+        this.principalDetailsService = principalDetailsService;
     }
 
     /**
      * 인증(Authentication) 객체를 기반으로 Access Token과 Refresh Token 생성
      */
     public JwtDTO generateToken(Authentication authentication) {
-        // 권한 정보
+        // 권한 가져오기
         String authorities = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(","));
@@ -50,7 +45,7 @@ public class JwtProvider {
         long now = (new Date()).getTime();
 
         // Access Token 생성
-        Date accessTokenExpiresIn = new Date(now + accessTokenValidityInMilliseconds);
+        Date accessTokenExpiresIn = new Date(now + ACCESS_TOKEN_EXPIRE_TIME);
         String accessToken = Jwts.builder()
                 .setSubject(authentication.getName())
                 .claim(Constants.JWT_AUTHORITIES_KEY, authorities)
@@ -60,7 +55,7 @@ public class JwtProvider {
 
         // Refresh Token 생성
         String refreshToken = Jwts.builder()
-                .setExpiration(new Date(now + refreshTokenValidityInMilliseconds))
+                .setExpiration(new Date(now + REFRESH_TOKEN_EXPIRE_TIME))
                 .signWith(key, SignatureAlgorithm.HS512)
                 .compact();
 
@@ -68,6 +63,7 @@ public class JwtProvider {
                 .grantType(Constants.JWT_TOKEN_PREFIX)
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
+                .refreshTokenExpirationTime(REFRESH_TOKEN_EXPIRE_TIME)
                 .build();
     }
 
@@ -77,21 +73,8 @@ public class JwtProvider {
     public Authentication getAuthentication(String accessToken) {
         // Jwt 토큰 복호화
         Claims claims = parseClaims(accessToken);
-
-        if (claims.get(Constants.JWT_AUTHORITIES_KEY) == null) {
-            throw new RuntimeException("권한 정보가 없는 토큰입니다.");
-        }
-
-        // 클레임에서 권한 정보 가져오기
-        Collection<? extends GrantedAuthority> authorities =
-                Arrays.stream(claims.get(Constants.JWT_AUTHORITIES_KEY).toString().split(","))
-                        .map(SimpleGrantedAuthority::new)
-                        .collect(Collectors.toList());
-
-        // UserDetails 객체를 만들어서 Authentication return
-        // UserDetails: interface, User: UserDetails를 구현한 class
-        UserDetails principal = new User(claims.getSubject(), "", authorities);
-        return new UsernamePasswordAuthenticationToken(principal, "", authorities);
+        UserDetails userDetails = principalDetailsService.loadUserByUsername(claims.getSubject());
+        return new UsernamePasswordAuthenticationToken(userDetails, accessToken, userDetails.getAuthorities());
     }
 
     /**
@@ -113,7 +96,6 @@ public class JwtProvider {
         } catch (IllegalArgumentException e) {
             log.info("JWT claims string is empty.(JWT 토큰이 잘못되었습니다.)", e);
         }
-
         return false;
     }
 
@@ -130,5 +112,20 @@ public class JwtProvider {
         } catch (ExpiredJwtException e) {
             return e.getClaims();
         }
+    }
+
+    /**
+     * accessToken 남은 유효시간
+     */
+    public Long getExpiration(String accessToken) {
+        Date expiration = Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(accessToken)
+                .getBody()
+                .getExpiration();
+        // 현재 시간
+        Long now = new Date().getTime();
+        return (expiration.getTime() - now);
     }
 }
