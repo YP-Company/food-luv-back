@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.AuditorAware;
 
 @Configuration
-public class JpaAuditConfiguration {
+public class JpaAuditConfig {
 
     @Bean
     public AuditorAware<Long> auditorProvider() {
