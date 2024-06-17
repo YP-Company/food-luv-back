@@ -1,7 +1,6 @@
-package com.youngpotato.foodluv.common.auth.oauth2.service;
+package com.youngpotato.foodluv.common.auth.oauth2;
 
 import com.youngpotato.foodluv.common.auth.Role;
-import com.youngpotato.foodluv.common.auth.oauth2.OAuthAttributes;
 import com.youngpotato.foodluv.common.auth.oauth2.handler.OAuth2LoginSuccessHandler;
 import com.youngpotato.foodluv.domain.member.Member;
 import com.youngpotato.foodluv.domain.member.MemberRepository;

@@ -2,7 +2,7 @@ package com.youngpotato.foodluv.config;
 
 import com.youngpotato.foodluv.common.auth.oauth2.handler.OAuth2LoginFailureHandler;
 import com.youngpotato.foodluv.common.auth.oauth2.handler.OAuth2LoginSuccessHandler;
-import com.youngpotato.foodluv.common.auth.oauth2.service.PrincipalOauth2UserService;
+import com.youngpotato.foodluv.common.auth.oauth2.PrincipalOauth2UserService;
 import com.youngpotato.foodluv.common.jwt.JwtAuthenticationFilter;
 import com.youngpotato.foodluv.common.jwt.JwtProvider;
 import lombok.RequiredArgsConstructor;
