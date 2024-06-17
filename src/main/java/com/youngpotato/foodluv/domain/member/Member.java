@@ -30,4 +30,16 @@ public class Member extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "role", nullable = false)
     private Role role;
+
+    @Column(name = "provider")
+    private String provider;
+
+    @Column(name = "provider_id")
+    private String providerId;
+
+    // 같은 이메일로 일반 회원가입을 한 사용자의 경우 provider 업데이트 처리
+    public void updateProvider(String provider, String providerId) {
+        this.provider = provider;
+        this.providerId = providerId;
+    }
 }
